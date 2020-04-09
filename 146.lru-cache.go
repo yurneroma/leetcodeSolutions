@@ -15,71 +15,55 @@
  *
  * Design and implement a data structure for Least Recently Used (LRU) cache.
  * It should support the following operations: get and put.
- * 
+ *
  * get(key) - Get the value (will always be positive) of the key if the key
  * exists in the cache, otherwise return -1.
  * put(key, value) - Set or insert the value if the key is not already present.
  * When the cache reached its capacity, it should invalidate the least recently
  * used item before inserting a new item.
- * 
+ *
  * The cache is initialized with a positive capacity.
- * 
+ *
  * Follow up:
  * Could you do both operations in O(1) time complexity?
- * 
- * Example:
- * 
- * 
- * LRUCache cache = new LRUCache( 2 /* capacity */ );
- * 
- * cache.put(1, 1);
- * cache.put(2, 2);
- * cache.get(1);       // returns 1
- * cache.put(3, 3);    // evicts key 2
- * cache.get(2);       // returns -1 (not found)
- * cache.put(4, 4);    // evicts key 1
- * cache.get(1);       // returns -1 (not found)
- * cache.get(3);       // returns 3
- * cache.get(4);       // returns 4
- * 
- * 
- * 
  *
+ * Example:
+ *
+ *
+ * LRUCache cache = new LRUCache( 2 capacity)
  */
 
 // @lc code=start
 type Node struct {
-	Val int
-	Key int 
-	Pre *Node
+	Val  int
+	Key  int
+	Pre  *Node
 	Next *Node
 }
 
 type LRUCache struct {
-	Cap int
-	Map map[int]*Node
+	Cap  int
+	Map  map[int]*Node
 	Head *Node
-	Last *Node
+	Tail *Node
 }
-
 
 func Constructor(capacity int) LRUCache {
 	cache := LRUCache{
-		Cap: capacity,
-		Map: make(map[int]*Node,capacity),
+		Cap:  capacity,
+		Map:  make(map[int]*Node, capacity),
 		Head: &Node{},
 		Tail: &Node{},
 	}
-	cache.Head.Next = cache.Last
-	cache.Last.Pre = cache.Head
+	cache.Head.Next = cache.Tail
+	cache.Tail.Pre = cache.Head
 	return cache
-	
-}
 
+}
 
 func (this *LRUCache) Get(key int) int {
 	node, ok := this.Map[key]
-	if !ok{
+	if !ok {
 		return -1
 	}
 	this.remove(node)
@@ -88,17 +72,36 @@ func (this *LRUCache) Get(key int) int {
 	return node.Val
 
 }
-func (this *LRUCache)remove(node *Node){
+func (this *LRUCache) remove(node *Node) {
 	node.Pre.Next = node.Next
 	node.Next.Pre = node.Pre
+}
+func (this *LRUCache) putHead(node *Node) {
+	originNext := this.Head.Next
+	this.Head.Next = node
+	node.Pre = this.Head
+	node.Next = originNext
+	originNext.Pre = node
 
 }
 
-
-func (this *LRUCache) Put(key int, value int)  {
-    
+func (this *LRUCache) Put(key int, value int) {
+	node, ok := this.Map[key]
+	if ok {
+		node.Val = value
+		this.remove(node)
+		this.putHead(node)
+	} else {
+		if len(this.Map) >= this.Cap {
+			deleteKey := this.Tail.Pre.Key
+			this.remove(this.Tail.Pre)
+			delete(this.Map, deleteKey)
+		}
+		newNode := &Node{Key: key, Val: value}
+		this.putHead(newNode)
+		this.Map[key] = newNode
+	}
 }
-
 
 /**
  * Your LRUCache object will be instantiated and called as such:
