@@ -17,6 +17,7 @@ func deleteDuplicates(head *ListNode) *ListNode {
 		return head
 	}
 	//要用当前节点，pre 比较令人困惑。 cur = cur.Next equal  pre = cur
+	// cur.Next 不断后移，和当前值比较。
 	cur := head
 	for cur.Next != nil && cur != nil {
 		if cur.Val == cur.Next.Val {
@@ -25,16 +26,6 @@ func deleteDuplicates(head *ListNode) *ListNode {
 			cur = cur.Next
 		}
 	}
-	// pre := head
-	// cur := head.Next
-	// for cur != nil {
-	// 	if pre.Val == cur.Val {
-	// 		pre.Next = cur.Next
-	// 	} else {
-	// 		pre = cur
-	// 	}
-	// 	cur = cur.Next
-	// }
 	return head
 }
 
