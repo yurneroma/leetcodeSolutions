@@ -38,7 +38,7 @@ func zigzagLevelOrder(root *TreeNode) [][]int {
 			reverse(valList)
 		}
 		left2Right = !left2Right
-		s = append(append, valList)
+		s = append(s, valList)
 	}
 	return s
 }
