@@ -118,9 +118,6 @@ func ladderLength(beginWord string, endWord string, wordList []string) int {
 
 // @lc code=end
 
-func main() {
-	beginWord := "hit"
-	endWord := "cog"
-	wordList := []string{"hot", "dot", "dog", "lot", "log", "cog"}
-	ladderLength(beginWord, endWord, wordList)
+func doubleBfs(beginWord, endWord string, wordList []string) int {
+
 }
