@@ -70,8 +70,98 @@ import "fmt"
  *
  */
 
+type Node struct {
+	Word  string
+	Level int
+}
+
+func bidirectionalBfs(beginWord, endWord string, wordList []string) int {
+	adjacencyDict := make(map[string][]string, 0)
+	valList := make([]string, 0)
+
+	if !isMemBer(wordList, endWord) {
+		return 0
+	}
+	//construct adjacency list
+	for _, word := range wordList {
+		for i := 0; i < len(beginWord); i++ {
+			key := fmt.Sprint(word[:i], "*", word[i+1:])
+			valList = adjacencyDict[key]
+			valList = append(valList, word)
+			adjacencyDict[key] = valList
+		}
+	}
+
+	//double bfs
+	queueBegin := make([]Node, 0)
+	queueEnd := make([]Node, 0)
+	queueBegin = append(queueBegin, Node{Word: beginWord, Level: 1})
+	queueEnd = append(queueEnd, Node{Word: endWord, Level: 1})
+	visitedBegin := make(map[string]int, 0)
+	visitedEnd := make(map[string]int, 0)
+	visitedBegin[beginWord] = 1
+	visitedEnd[endWord] = 1
+	for len(queueBegin) > 0 && len(queueEnd) > 0 {
+		path, tempQueueBegin := visitNode(queueBegin, visitedBegin, visitedEnd, adjacencyDict)
+		if path > -1 {
+			fmt.Println("path ", path)
+			return path
+		}
+
+		path, tempQueueEnd := visitNode(queueEnd, visitedEnd, visitedBegin, adjacencyDict)
+		if path > -1 {
+			fmt.Println("path ", path)
+			return path
+		}
+		queueBegin = tempQueueBegin
+		queueEnd = tempQueueEnd
+	}
+	return 0
+}
+
+func visitNode(queue []Node, visited, otherVisited map[string]int, adjacencyDict map[string][]string) (int, []Node) {
+	tempQueue := make([]Node, 0)
+	level := -1
+	for _, item := range queue {
+		level = item.Level
+		for i := 0; i < len(item.Word); i++ {
+			key := fmt.Sprint(item.Word[:i], "*", item.Word[i+1:])
+			valList := adjacencyDict[key]
+			for _, word := range valList {
+				if otherVisited[word] > 0 {
+					fmt.Println("the level is ", level)
+					fmt.Println("valList", valList)
+					fmt.Println("other", otherVisited)
+					return level + otherVisited[word], nil
+				}
+				if visited[word] == 0 {
+					visited[word] = level + 1
+					tempQueue = append(tempQueue, Node{Level: level + 1, Word: word})
+				}
+			}
+		}
+	}
+	return -1, tempQueue
+}
+
+func isMemBer(s []string, item string) bool {
+	for _, elem := range s {
+		if elem == item {
+			return true
+		}
+	}
+	return false
+}
+
 // @lc code=start
 func ladderLength(beginWord string, endWord string, wordList []string) int {
+	path := bidirectionalBfs(beginWord, endWord, wordList)
+	return path
+}
+
+// @lc code=end
+
+func bfs(beginWord, endWord string, wordList []string) int {
 	//edge condition
 	length := len(beginWord)
 
@@ -116,8 +206,9 @@ func ladderLength(beginWord string, endWord string, wordList []string) int {
 	return 0
 }
 
-// @lc code=end
-
-func doubleBfs(beginWord, endWord string, wordList []string) int {
-
-}
+// func main() {
+// 	beginWord := "a"
+// 	endWord := "c"
+// 	wordList := []string{"a", "b", "c"}
+// 	fmt.Println(DoubleBfs(beginWord, endWord, wordList))
+// }
