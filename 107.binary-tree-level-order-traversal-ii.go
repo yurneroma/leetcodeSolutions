@@ -59,8 +59,8 @@ package main
 
 func levelOrderBottom(root *TreeNode) [][]int {
 	var res [][]int
-	walkByDFS(root, 0, res)
-	val := make([][]int, 0)
+	var val [][]int
+	walkByDFS(root, 0, &res)
 	for i := len(res) - 1; i >= 0; i-- {
 		slice := res[i]
 		val = append(val, slice)
@@ -69,20 +69,19 @@ func levelOrderBottom(root *TreeNode) [][]int {
 }
 
 //DFS
-func walkByDFS(root *TreeNode, level int, res [][]int) [][]int {
+func walkByDFS(root *TreeNode, level int, res *[][]int) {
 	if root == nil {
-		return [][]int{}
+		return
 	}
-	if level == len(res) {
+	if level == len(*res) {
 		list := make([]int, 0)
-		res = append(res, list)
+		*res = append(*res, list)
 	}
-	elemList := res[level]
+	elemList := (*res)[level]
 	elemList = append(elemList, root.Val)
-	res[level] = elemList
+	(*res)[level] = elemList
 	walkByDFS(root.Left, level+1, res)
 	walkByDFS(root.Right, level+1, res)
-	return res
 
 }
 
