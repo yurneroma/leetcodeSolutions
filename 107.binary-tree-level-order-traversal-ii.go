@@ -57,8 +57,37 @@ package main
 // 	Right *TreeNode
 // }
 
-//利用栈来存储节点， 然后pop()出栈
 func levelOrderBottom(root *TreeNode) [][]int {
+	var res [][]int
+	walkByDFS(root, 0, res)
+	val := make([][]int, 0)
+	for i := len(res) - 1; i >= 0; i-- {
+		slice := res[i]
+		val = append(val, slice)
+	}
+	return val
+}
+
+//DFS
+func walkByDFS(root *TreeNode, level int, res [][]int) [][]int {
+	if root == nil {
+		return [][]int{}
+	}
+	if level == len(res) {
+		list := make([]int, 0)
+		res = append(res, list)
+	}
+	elemList := res[level]
+	elemList = append(elemList, root.Val)
+	res[level] = elemList
+	walkByDFS(root.Left, level+1, res)
+	walkByDFS(root.Right, level+1, res)
+	return res
+
+}
+
+//队列存层节点， 遍历层节点，val 按层放入二维数组，  最后二维数组倒序输出
+func walkByBFS(root *TreeNode) [][]int {
 	res := make([][]int, 0)
 	if root == nil {
 		return res
@@ -89,6 +118,7 @@ func levelOrderBottom(root *TreeNode) [][]int {
 		val = append(val, res[i])
 	}
 	return val
+
 }
 
 // @lc code=end
